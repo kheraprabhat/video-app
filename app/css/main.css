@@ -31,8 +31,6 @@ body {
 
 */
 
-@global-import '.slick-prev';
-
 .slick-prev {
   left: 0;
 }

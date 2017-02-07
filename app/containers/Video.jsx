@@ -6,15 +6,19 @@ import styles from '../css/components/video';
 const cx = classNames.bind(styles);
 
 class Video extends Component {
-    render() {
-		const video = this.props.video;
-	    return (
-	    	<div data-index={this.props.index}>
-		    	<img src={video.images[0].url} />
-		    	<h3>{video.title}</h3>
-	    	</div>
-	    );
-    }
+  clickHandler(index) {
+    const video = this.props.video;
+    this.props.openModal(video);
+  }
+  render() {
+    const video = this.props.video;
+    return (
+      <div data-index={this.props.index} onClick={() => this.clickHandler(this.props.index)}>
+        <img src={video.images[0].url} />
+        <h3>{video.title}</h3>
+      </div>
+    );
+  }
 };
 
 export default Video;

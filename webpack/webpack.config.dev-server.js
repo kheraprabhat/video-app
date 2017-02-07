@@ -1,79 +1,123 @@
-'use strict';
-
 var path = require('path');
 var webpack = require('webpack');
-var assetsPath = path.join(__dirname, '..', 'public', 'assets');
-var commonWebpackConfig = require('./webpack.common.config');
-var webpackConfigMerger = require('webpack-merge');
-var webpackConfigValidator = require('webpack-validator');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-var commonLoaders = [
+var commonConfig = require('./common.config');
+var commonLoaders = commonConfig.commonLoaders;
+var externals = commonConfig.externals;
+var assetsPath = commonConfig.output.assetsPath;
+var distPath = commonConfig.output.distPath;
+var publicPath = commonConfig.output.publicPath;
+var postCSSConfig = commonConfig.postCSSConfig;
+
+module.exports = [
   {
-    /*
-     * TC39 categorises proposals for babel in 4 stages
-     * Read more http://babeljs.io/docs/usage/experimental/
+    // The configuration for the client
+    name: 'browser',
+    /* The entry point of the bundle
+     * Entry points for multi page app could be more complex
+     * A good example of entry points would be:
+     * entry: {
+     *   pageA: "./pageA",
+     *   pageB: "./pageB",
+     *   pageC: "./pageC",
+     *   adminPageA: "./adminPageA",
+     *   adminPageB: "./adminPageB",
+     *   adminPageC: "./adminPageC"
+     * }
+     *
+     * We can then proceed to optimize what are the common chunks
+     * plugins: [
+     *  new CommonsChunkPlugin("admin-commons.js", ["adminPageA", "adminPageB"]),
+     *  new CommonsChunkPlugin("common.js", ["pageA", "pageB", "admin-commons.js"], 2),
+     *  new CommonsChunkPlugin("c-commons.js", ["pageC", "adminPageC"]);
+     * ]
      */
-    test: /\.js$|\.jsx$/,
-    loader: 'babel-loader',
-    // Reason why we put this here instead of babelrc
-    // https://github.com/gaearon/react-transform-hmr/issues/5#issuecomment-142313637
-    query: {
-      "presets": ["es2015", "react", "stage-0"],
-      "plugins": ["transform-decorators-legacy", "transform-object-assign"]
-    },
-    include: path.join(__dirname, '..', 'app'),
-    exclude: path.join(__dirname, '..', 'node_modules')
-  },
-  { test: /\.json$/, loader: "json-loader" },
-  {
-    test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|otf|cur)$/,
-    loader: 'url',
-    query: {
-        name: '[hash].[ext]',
-        limit: 10000,
-    }
-  },
-  { test: /\.html$/, loader: 'html-loader' }
-];
-
-var config = {
-    // The configuration for the server-side rendering
-    name: "server-side rendering",
-    context: path.join(__dirname, "..", "app"),
-    devtool: 'source-map',
+    // SourceMap without column-mappings
+    devtool: 'cheap-module-source-map',
+    context: path.join(__dirname, '..', 'app'),
     entry: {
-      server: "./server"
-    },
-    target: "node",
-    eslint: {
-      failOnError: true
+      app: './client'
     },
     output: {
       // The output directory as absolute path
       path: assetsPath,
       // The filename of the entry chunk as relative path inside the output.path directory
-      filename: "[name].js",
+      filename: '[name].js',
       // The output path from the view of the Javascript
-      publicPath: "/assets/",
-      libraryTarget: "commonjs2"
+      publicPath: publicPath
+
     },
     module: {
-      loaders: commonLoaders.concat([
-           {
-              test: /\.css$/,
-              loader: 'css/locals?module&localIdentName=[name]__[local]___[hash:base64:5]'
-           }
-      ])
+      loaders: commonLoaders.concat(
+        {
+          test: /\.css$/,
+          loader: ExtractTextPlugin.extract("style", "css?sourceMap?sourceMap&outputStyle=expanded")
+        }
+      )
     },
     resolve: {
       root: [path.join(__dirname, '..', 'app')],
-      extensions: ['', '.js', '.jsx', '.css'],
+      extensions: ['', '.js', '.jsx', '.css']
     },
     plugins: [
-        new webpack.DefinePlugin({
-          __DEVCLIENT__: false,
-          __DEVSERVER__: true
-        })    ]
-};
-
-module.exports = webpackConfigMerger(config, commonWebpackConfig.preLoaders(),  commonWebpackConfig.vendorChunks());
+        // extract inline css from modules into separate files
+        new ExtractTextPlugin('styles/main.css', { allChunks: true }),
+        new webpack.optimize.UglifyJsPlugin({
+          compressor: {
+            warnings: false
+          }
+        }),
+        new webpack.EnvironmentPlugin(['NODE_ENV'])
+    ]
+  }, {
+    // The configuration for the server-side rendering
+    name: 'server-side rendering',
+    context: path.join(__dirname, '..', 'app'),
+    entry: {
+      server: '../server/index'
+    },
+    target: 'node',
+    node: {
+      __dirname: false
+    },
+    devtool: 'sourcemap',
+    output: {
+      // The output directory as absolute path
+      path: distPath,
+      // The filename of the entry chunk as relative path inside the output.path directory
+      filename: 'server.dev.js',
+      // The output path from the view of the Javascript
+      publicPath: publicPath,
+      libraryTarget: 'commonjs2'
+    },
+    module: {
+      loaders: commonLoaders.concat({
+          test: /\.css$/,
+          loader: 'css?sourceMap?sourceMap&outputStyle=expanded'
+      })
+    },
+    resolve: {
+      root: [path.join(__dirname, '..', 'app')],
+      extensions: ['', '.js', '.jsx', '.css']
+    },
+    externals: externals,
+    plugins: [
+        // Order the modules and chunks by occurrence.
+        // This saves space, because often referenced modules
+        // and chunks get smaller ids.
+        new webpack.optimize.OccurenceOrderPlugin(),
+        new webpack.EnvironmentPlugin(['NODE_ENV']),
+        new webpack.IgnorePlugin(/vertx/),
+        new webpack.optimize.UglifyJsPlugin({
+          compressor: {
+            warnings: false
+          }
+        }),
+        new webpack.BannerPlugin(
+          'require("source-map-support").install();',
+          { raw: true, entryOnly: false }
+        )
+    ]
+  }
+];
