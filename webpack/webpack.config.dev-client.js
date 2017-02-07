@@ -1,12 +1,12 @@
-'use strict';
-
 var path = require('path');
 var webpack = require('webpack');
-var assetsPath = path.join(__dirname, '..', 'public', 'assets');
+var styleLintPlugin = require('stylelint-webpack-plugin');
 var hotMiddlewareScript = 'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000&reload=true';
-var commonWebpackConfig = require('./webpack.common.config');
-var webpackConfigMerger = require('webpack-merge');
-var webpackConfigValidator = require('webpack-validator');
+
+var commonConfig = require('./common.config');
+var postCSSConfig = commonConfig.postCSSConfig;
+var assetsPath = commonConfig.output.assetsPath;
+var publicPath = commonConfig.output.publicPath;
 
 var commonLoaders = [
   {
@@ -19,48 +19,23 @@ var commonLoaders = [
     // Reason why we put this here instead of babelrc
     // https://github.com/gaearon/react-transform-hmr/issues/5#issuecomment-142313637
     query: {
-      "presets": ["react-hmre", "es2015", "react", "stage-0"],
-      "plugins": ["transform-decorators-legacy", "transform-object-assign"]
+      presets: ['react-hmre', 'es2015', 'react', 'stage-0'],
     },
-    include: path.join(__dirname, '..', 'app'),
     exclude: path.join(__dirname, '..', 'node_modules')
   },
   {
-    test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|otf|cur)$/,
+    test: /\.(png|jpg|jpeg|gif|svg|woff|woff2)$/,
     loader: 'url',
     query: {
         name: '[hash].[ext]',
         limit: 10000,
     }
-  },
-  { test: /\.html$/, loader: 'html-loader' }
+  }
 ];
 
-var postCSSConfig = function() {
-  return [
-    require('postcss-import')({
-      path: path.join(__dirname, '..', 'app', 'css'),
-      // addDependencyTo is used for hot-reloading in webpack
-      addDependencyTo: webpack
-    }),
-    require('postcss-simple-vars')(),
-    // Unwrap nested rules like how Sass does it
-    require('postcss-nested')(),
-    //  parse CSS and add vendor prefixes to CSS rules
-    require('autoprefixer')({
-      browsers: ['last 2 versions', 'IE > 8']
-    }),
-    // A PostCSS plugin to console.log() the messages registered by other
-    // PostCSS plugins
-    require('postcss-reporter')({
-      clearMessages: true
-    })
-  ];
-};
-
-var config = {
+module.exports = {
     // eval - Each module is executed with eval and //@ sourceURL.
-    //devtool: 'eval',
+    devtool: 'eval',
     // The configuration for the client
     name: 'browser',
     /* The entry point of the bundle
@@ -82,15 +57,11 @@ var config = {
      *  new CommonsChunkPlugin("c-commons.js", ["pageC", "adminPageC"]);
      * ]
      */
-    devtool: 'source-map',
     context: path.join(__dirname, '..', 'app'),
     // Multiple entry with hot loader
     // https://github.com/glenjamin/webpack-hot-middleware/blob/master/example/webpack.config.multientry.js
     entry: {
       app: ['./client', hotMiddlewareScript]
-    },
-    eslint: {
-      failOnError: true
     },
     output: {
       // The output directory as absolute path
@@ -98,14 +69,13 @@ var config = {
       // The filename of the entry chunk as relative path inside the output.path directory
       filename: '[name].js',
       // The output path from the view of the Javascript
-      publicPath: '/assets/'
+      publicPath: publicPath
     },
     module: {
-      loaders: commonLoaders.concat([
-        { test: /\.css$/,
-          loader: 'style!css?module&localIdentName=[name]__[local]___[hash:base64:5]!postcss-loader'
-        }
-      ])
+      loaders: commonLoaders.concat({
+        test: /\.css$/,
+        loader: 'style!css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss-loader'
+      })
     },
     resolve: {
       root: [path.join(__dirname, '..', 'app')],
@@ -114,13 +84,12 @@ var config = {
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin(),
-        commonWebpackConfig.styleLintPlugin(),
-        new webpack.DefinePlugin({
-          __DEVCLIENT__: true,
-          __DEVSERVER__: false
+        new webpack.EnvironmentPlugin(['NODE_ENV']),
+        new styleLintPlugin({
+          configFile: path.join(__dirname, '..', '.stylelintrc'),
+          context: path.join(__dirname, '..', 'app'),
+          files: '**/*.?(sa|sc|c)ss'
         })
     ],
     postcss: postCSSConfig
 };
-
-module.exports = webpackConfigMerger(config, commonWebpackConfig.preLoaders(), commonWebpackConfig.vendorChunks());

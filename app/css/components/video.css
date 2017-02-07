@@ -1,0 +1,38 @@
+.video-on-demand {
+  width: 1164px;
+  margin: 0 auto;
+}
+.slick-prev {
+  left: -25px;
+}
+.slide-div {
+  display: inline-block;
+}
+.slick-next::before, .slick-prev::before {
+  color: #000;
+}
+.ReactModalPortal .videoContainer {
+  margin: 0 auto;
+  width: 600px;
+}
+.ReactModalPortal .description {
+  margin: 0 auto;
+  width: 600px;
+}
+.ReactModalPortal .closeBtn {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+video::-internal-media-controls-download-button {
+  display:none;
+}
+
+video::-webkit-media-controls-enclosure {
+  overflow:hidden;
+}
+
+video::-webkit-media-controls-panel {
+  width: calc(100% + 30px); /* Adjust as needed */
+}
