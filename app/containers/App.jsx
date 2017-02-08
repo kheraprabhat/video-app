@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react';
 import Navigation from '../containers/Navigation';
 import Video from '../containers/Video';
 
-
 /*
  * React-router's <Router> component renders <Route>'s
  * and replaces `this.props.children` with the proper React Component.
@@ -14,9 +13,11 @@ import Video from '../containers/Video';
  */
 const App = ({children}) => {
   return (
-    <div className={'app'}>
-      <Navigation />
-      	{children}
+  	<div className='row'>
+	    <div className={'app col-xs-12'}>
+	      <Navigation />
+	      	{children}
+	    </div>
     </div>
   );
 };

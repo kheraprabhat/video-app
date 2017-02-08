@@ -65,32 +65,40 @@ class Videos extends Component {
       centerMode: true,
       centerPadding: '20px',
     	currentSlide: 1,
-    	slideCount: this.props.videos.totalCount
+    	slideCount: this.props.videos.totalCount,
+      responsive: [ 
+        { breakpoint: 767, settings: { slidesToShow: 5, vertical: true, arrows: true, swipeToSlide: true } }, 
+        { breakpoint: 768, settings: { slidesToShow: 2, vertical: false, arrows: true, swipeToSlide: true } }, 
+        { breakpoint: 1024, settings: { slidesToShow: 4, swipeToSlide: false } }, 
+        { breakpoint: 100000, settings: 'unslick' } 
+      ]
     };
     return (
-    	<div className='video-on-demand'>
-    		<Slider {...settings}>
-    		{
-  	      videos.map((video, i) => <div key={i}><Video video={video} index={i} openModal={this.openModal}/></div>)
-  	    }
-  	    </Slider>
-        <Modal
-          isOpen={this.state.modalIsOpen}
-          onAfterOpen={this.afterOpenModal}
-          onRequestClose={this.closeModal}
-          style={customStyles}
-          contentLabel="Example Modal">
-          <h2 ref="subtitle">{this.state.video && this.state.video.title}</h2>
-          <button className='closeBtn' onClick={this.closeModal}>close</button>
-          <div className='videoContainer'>
-            <video width="600px" controls autoplay>
-              <source src={this.state.video && this.state.video.contents && this.state.video.contents[0].url} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-          <div className='description'>{this.state.video && this.state.video.description}</div>
-        </Modal>
-    	</div>
+      <div className='col-xs-12'>
+      	<div className='video-on-demand'>
+      		<Slider {...settings}>
+      		{
+    	      videos.map((video, i) => <div key={i}><Video video={video} index={i} openModal={this.openModal}/></div>)
+    	    }
+    	    </Slider>
+          <Modal
+            isOpen={this.state.modalIsOpen}
+            onAfterOpen={this.afterOpenModal}
+            onRequestClose={this.closeModal}
+            style={customStyles}
+            contentLabel="Example Modal">
+            <h2 ref="subtitle">{this.state.video && this.state.video.title}</h2>
+            <button className='closeBtn' onClick={this.closeModal}>close</button>
+            <div className='videoContainer'>
+              <video width="600px" controls autoplay>
+                <source src={this.state.video && this.state.video.contents && this.state.video.contents[0].url} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div className='description'>{this.state.video && this.state.video.description}</div>
+          </Modal>
+      	</div>
+      </div>
     )
   }
 };
