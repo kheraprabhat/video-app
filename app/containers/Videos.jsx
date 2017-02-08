@@ -67,10 +67,10 @@ class Videos extends Component {
     	currentSlide: 1,
     	slideCount: this.props.videos.totalCount,
       responsive: [ 
-        { breakpoint: 767, settings: { slidesToShow: 5, vertical: true, arrows: true, swipeToSlide: true } }, 
-        { breakpoint: 768, settings: { slidesToShow: 2, vertical: false, arrows: true, swipeToSlide: true } }, 
-        { breakpoint: 1024, settings: { slidesToShow: 4, swipeToSlide: false } }, 
-        { breakpoint: 100000, settings: 'unslick' } 
+        { breakpoint: 480, settings: { slidesToShow: 1 } },
+        { breakpoint: 768, settings: { slidesToShow: 3 } }, 
+        { breakpoint: 1024, settings: { slidesToShow: 4 } },
+        { breakpoint: 1224, settings: { slidesToShow: 6 } }
       ]
     };
     return (
