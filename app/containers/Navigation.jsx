@@ -8,10 +8,12 @@ const cx = classNames.bind(styles);
 
 const Navigation = () => {
     return (
-      <nav className={cx('navigation')} role="navigation">
-        <Link className={cx('item')} to="/video" activeClassName={cx('active')}>Video</Link>
-        <Link to="/about" className={cx('item')} activeClassName={cx('active')}>About</Link>
-      </nav>
+      <div className='col-xs-12'>
+        <nav className={cx('navigation')} role="navigation">
+          <Link className={cx('item')} to="/video" activeClassName={cx('active')}>Video</Link>
+          <Link to="/about" className={cx('item')} activeClassName={cx('active')}>About</Link>
+        </nav>
+      </div>
     );
 };
 
