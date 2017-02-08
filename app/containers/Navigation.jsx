@@ -10,7 +10,7 @@ const Navigation = () => {
     return (
       <div className='col-xs-12'>
         <nav className={cx('navigation')} role="navigation">
-          <Link className={cx('item')} to="/video" activeClassName={cx('active')}>Video</Link>
+          <Link className={cx('item')} to="/video" activeClassName={cx('active')}>Videos</Link>
           <Link to="/about" className={cx('item')} activeClassName={cx('active')}>About</Link>
         </nav>
       </div>

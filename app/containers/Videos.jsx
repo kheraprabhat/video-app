@@ -73,33 +73,47 @@ class Videos extends Component {
         { breakpoint: 1224, settings: { slidesToShow: 6 } }
       ]
     };
-    return (
-      <div className='col-xs-12'>
-      	<div className='video-on-demand'>
-      		<Slider {...settings}>
-      		{
-    	      videos.map((video, i) => <div key={i}><Video video={video} index={i} openModal={this.openModal}/></div>)
-    	    }
-    	    </Slider>
-          <Modal
-            isOpen={this.state.modalIsOpen}
-            onAfterOpen={this.afterOpenModal}
-            onRequestClose={this.closeModal}
-            style={customStyles}
-            contentLabel="Example Modal">
-            <h2 ref="subtitle">{this.state.video && this.state.video.title}</h2>
-            <button className='closeBtn' onClick={this.closeModal}>close</button>
-            <div className='videoContainer'>
-              <video width="600px" controls autoplay>
-                <source src={this.state.video && this.state.video.contents && this.state.video.contents[0].url} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-            <div className='description'>{this.state.video && this.state.video.description}</div>
-          </Modal>
-      	</div>
-      </div>
-    )
+    
+    if (videos) {
+      return (
+        <div className='col-xs-12'>
+        	<div className='video-on-demand'>
+        		<Slider {...settings}>
+        		{
+      	      videos.map((video, i) => <div key={i}><Video video={video} index={i} openModal={this.openModal}/></div>)
+      	    }
+      	    </Slider>
+            <Modal
+              isOpen={this.state.modalIsOpen}
+              onAfterOpen={this.afterOpenModal}
+              onRequestClose={this.closeModal}
+              style={customStyles}
+              contentLabel="Example Modal">
+              <h2 ref="subtitle">{this.state.video && this.state.video.title}</h2>
+              <button className='closeBtn' onClick={this.closeModal}>close</button>
+              <div className='videoContainer'>
+                <video width="600px" controls autoplay>
+                  <source src={this.state.video && this.state.video.contents && this.state.video.contents[0].url} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <div className='description'>{this.state.video && this.state.video.description}</div>
+            </Modal>
+        	</div>
+        </div>);
+    } else if (videos && videos.entries && videos.entries.length === 0) {
+      return (<div className='col-xs-12'>
+          <div className='video-on-demand'>
+            <div className='col-xs-12 alert'>No Videos</div>
+          </div>
+        </div>);
+    } else {
+      return (<div className='col-xs-12'>
+          <div className='video-on-demand'>
+            <div className='col-xs-12 alert'>Loading ...</div>
+          </div>
+        </div>);
+    }
   }
 };
 
