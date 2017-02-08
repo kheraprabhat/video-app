@@ -8,9 +8,6 @@ switch (DB_TYPE) {
   case DB_TYPES.MONGO:
     dbConfig = require('./mongo').default;
     break;
-  case DB_TYPES.POSTGRES:
-    dbConfig = require('./postgres').default;
-    break;
   case DB_TYPES.NONE:
     dbConfig = require('./none').default;
     break;
@@ -20,6 +17,5 @@ switch (DB_TYPE) {
 
 export const connect = dbConfig.connect;
 export const controllers = dbConfig.controllers;
-export const passport = dbConfig.passport;
 export const session = dbConfig.session;
 

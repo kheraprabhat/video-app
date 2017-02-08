@@ -1,9 +1,7 @@
-import topics from './topics';
-import users from './users';
+import videos from './videos';
 
-export { topics, users };
+export { videos };
 
 export default {
-  topics,
-  users
+  videos
 };

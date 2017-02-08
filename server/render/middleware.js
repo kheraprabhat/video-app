@@ -58,6 +58,8 @@ export default function render(req, res) {
           res.status(200).send(html);
         })
         .catch(err => {
+          console.log('@@@@@@@@@@@@@@@@@@@@@@@@@ ERROR @@@@@@@@@@@@@@@@@@@@@@@');
+          console.log(err.stack);
           console.error(err);
           res.status(500).json(err);
         });
