@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import classNames from 'classnames/bind';
 import styles from '../css/components/video';
@@ -6,6 +7,7 @@ import Video from './Video';
 import $ from 'jquery';
 import Slider from 'react-slick';
 import { Modal, Button } from 'react-bootstrap';
+import { createVideo } from '../actions/videos';
 
 const cx = classNames.bind(styles);
 
@@ -18,8 +20,9 @@ class Videos extends Component {
     };
 
     this.openModal = this.openModal.bind(this);
-    this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.onVideoEnd = this.onVideoEnd.bind(this);
+    this.onModalOpen = this.onModalOpen.bind(this);
   }
 
   openModal(video) {
@@ -27,11 +30,16 @@ class Videos extends Component {
       showModal: true,
       video: video
     });
+    this.props.createVideo(video);
   }
 
-  afterOpenModal() {
-    // references are now sync'd and can be accessed.
-    this.refs.subtitle.style.color = '#f00';
+  onModalOpen() {
+    const vid = this.refs.videoPlayer;
+    vid.addEventListener('ended', this.onVideoEnd, false);
+  }
+
+  onVideoEnd(e) {
+    this.closeModal();
   }
 
   closeModal() {
@@ -45,8 +53,6 @@ class Videos extends Component {
     const videos = this.props.videos && this.props.videos.entries;
     const settings = {
       speed: 500,
-      slidesToShow: 5,
-      slidesToScroll: 5,
       lazyload: true,
       arrows: true,
       className: 'center',
@@ -54,11 +60,13 @@ class Videos extends Component {
       centerPadding: '20px',
     	currentSlide: 1,
     	slideCount: this.props.videos.totalCount,
+      slidesToShow: 5, 
+      slidesToScroll: 5,
       responsive: [ 
-        { breakpoint: 480, settings: { slidesToShow: 1 } },
-        { breakpoint: 768, settings: { slidesToShow: 3 } }, 
-        { breakpoint: 1024, settings: { slidesToShow: 4 } },
-        { breakpoint: 1224, settings: { slidesToShow: 6 } }
+        { breakpoint: 480, settings: { slidesToShow: 1, slidesToScroll: 1 } },
+        { breakpoint: 768, settings: { slidesToShow: 2, slidesToScroll: 2 } }, 
+        { breakpoint: 1024, settings: { slidesToShow: 3, slidesToScroll: 3 } },
+        { breakpoint: 1224, settings: { slidesToShow: 4, slidesToScroll: 4 } }
       ]
     };
     
@@ -72,13 +80,13 @@ class Videos extends Component {
       	    }
       	    </Slider>
             <div className="static-modal">
-              <Modal show={this.state.showModal} onHide={this.closeModal}>
+              <Modal show={this.state.showModal} onHide={this.closeModal} onEntered={this.onModalOpen}>
                 <Modal.Header closeButton>
                   <Modal.Title>{this.state.video && this.state.video.title}</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>
-                  <video width="100%" controls autoplay>
+                  <video width="100%" ref="videoPlayer" controls autoPlay>
                     <source src={this.state.video && this.state.video.contents && this.state.video.contents[0].url} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
@@ -105,4 +113,4 @@ class Videos extends Component {
   }
 };
 
-export default Videos;
+export default connect(null, { createVideo })(Videos);
