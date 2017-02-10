@@ -63,11 +63,6 @@ module.exports = [
     plugins: [
         // extract inline css from modules into separate files
         new ExtractTextPlugin('styles/main.css', { allChunks: true }),
-        new webpack.optimize.UglifyJsPlugin({
-          compressor: {
-            warnings: false
-          }
-        }),
         new webpack.EnvironmentPlugin(['NODE_ENV'])
     ]
   }, {
@@ -103,21 +98,9 @@ module.exports = [
     },
     externals: externals,
     plugins: [
-        // Order the modules and chunks by occurrence.
-        // This saves space, because often referenced modules
-        // and chunks get smaller ids.
-        new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.EnvironmentPlugin(['NODE_ENV']),
-        new webpack.IgnorePlugin(/vertx/),
-        new webpack.optimize.UglifyJsPlugin({
-          compressor: {
-            warnings: false
-          }
-        }),
-        new webpack.BannerPlugin(
-          'require("source-map-support").install();',
-          { raw: true, entryOnly: false }
-        )
+        // extract inline css from modules into separate files
+        new ExtractTextPlugin('styles/main.css', { allChunks: true }),
+        new webpack.EnvironmentPlugin(['NODE_ENV'])
     ]
   }
 ];

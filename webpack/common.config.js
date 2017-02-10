@@ -31,9 +31,7 @@ module.exports = {
       query: {
         presets: ['es2015', 'react', 'stage-0'],
         plugins: [
-          'transform-react-remove-prop-types',
-          'transform-react-constant-elements',
-          'transform-react-inline-elements'
+          "transform-decorators-legacy", "transform-object-assign"
         ]
       },
       exclude: path.join(__dirname, '..', 'node_modules')

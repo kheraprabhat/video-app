@@ -6,43 +6,49 @@ import * as types from '../types';
 
 polyfill();
 
-export function makeVideoRequest(method, id, data, api = '/video') {
-  return request[method](api + (id ? ('/' + id) : ''), data);
+export function makeVideoRequest(method, id, data, api = '/videos') {
+  return request[method](api, data);
 }
 
-export function createVideoSuccess() {
+export function createVideoSuccess(data) {
   return {
-    type: types.CREATE_VIDEO_SUCCESS
+    type: types.CREATE_VIDEO_SUCCESS,
+    data
   };
 }
 
-export function createTopicFailure(data) {
+export function createVideoFailure(data) {
   return {
     type: types.CREATE_VIDEO_FAILURE,
-    id: data.id,
-    error: data.error
+    data
   };
 }
 
-/*
- * @param data
- * @return a simple JS object
- */
-export function createVideoRequest(data) {
-  return {
-    type: types.VIDEO_FETCH_SUCCESS,
-    id: data.id,
-    count: data.count
+export function getAllVideos() {
+  return (dispatch, getState) => {
+    return makeVideoRequest('get', '', data)
+      .then(res => {
+        if (res.status === 200) {
+          // We can actually dispatch a CREATE_TOPIC_SUCCESS
+          // on success, but I've opted to leave that out
+          // since we already did an optimistic update
+          // We could return res.json();
+          return dispatch(createVideoSuccess(data));
+        }
+      })
+      .catch(() => {
+        return dispatch(createVideoFailure({ id, error: 'Oops! Something went wrong and we couldn\'t create your topic'}));
+      });
   };
 }
 
-export function createVideo(video) {
+export function createVideo(vid) {
   return (dispatch, getState) => {
     // If the text box is empty
-    const id = video.id;
+    const id = vid.id;
     // Redux thunk's middleware receives the store methods `dispatch`
     // and `getState` as parameters
-    const { videoSt } = getState();
+    const { video } = getState();
     const data = {
       count: 1,
       id
@@ -50,12 +56,9 @@ export function createVideo(video) {
 
     // Conditional dispatch
     // If the topic already exists, make sure we emit a dispatch event
-    if (videoSt.watched.filter(videoItem => videoItem.id === id).length > 0) {
+    if (video && video.watched && video.watched.filter(videoItem => videoItem.id === id).length > 0) {
       data.count = videoItem.count + 1;
     }
-
-    // First dispatch an optimistic update
-    dispatch(createVideoRequest(data));
 
     return makeVideoRequest('post', id, data)
       .then(res => {
@@ -64,7 +67,7 @@ export function createVideo(video) {
           // on success, but I've opted to leave that out
           // since we already did an optimistic update
           // We could return res.json();
-          return dispatch(createVideoSuccess());
+          return dispatch(createVideoSuccess(data));
         }
       })
       .catch(() => {

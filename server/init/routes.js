@@ -10,7 +10,7 @@ export default (app) => {
   // topic routes
   if (videosController) {
     app.get('/videos', videosController.all);
-    app.post('/videos/:id', videosController.add);
+    app.post('/videos', videosController.add);
     app.put('/videos/:id', videosController.update);
     app.delete('/videos/:id', videosController.remove);
   } else {

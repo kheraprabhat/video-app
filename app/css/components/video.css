@@ -24,15 +24,15 @@
   right: 10px;
   top: 10px;
 }
-
-video::-internal-media-controls-download-button {
-  display:none;
+.image-container {
+  width: 214px;
 }
-
-video::-webkit-media-controls-enclosure {
-  overflow:hidden;
+.image-container img {
+  height: 317px;
+  width: 214px;
 }
-
-video::-webkit-media-controls-panel {
-  width: calc(100% + 30px); /* Adjust as needed */
+.image-container h3 {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }

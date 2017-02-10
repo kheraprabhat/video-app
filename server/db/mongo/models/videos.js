@@ -5,17 +5,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 const VideosSchema = new mongoose.Schema({
-  title: String,
-  description: String,
-  type: String,
-  publishedDate: { type: Date, default: Date.now },
-  availableDate: { type: Date, default: Date.now },
-  metadata: Schema.Types.Mixed,
-  contents: Schema.Types.Mixed,
-  credits: Schema.Types.Mixed,
-  parentalRatings: Schema.Types.Mixed,
-  images: Schema.Types.Mixed,
-  categories: Schema.Types.Mixed,
+  count: Number,
   id: String
 });
 

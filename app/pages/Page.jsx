@@ -3,7 +3,7 @@ import Helmet from 'react-helmet';
 
 const Page = ({ title, link, meta, children }) => {
   return (
-    <div className='row'>
+    <div className='col-xs-12'>
       <Helmet title={title} link={link} meta={meta} />
       { children }
     </div>
